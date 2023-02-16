@@ -275,6 +275,7 @@ public class drivePrototype extends LinearOpMode {
 
             telemetry.addLine("Claw");
             telemetry.addData("pos", claw.getPosition());
+            telemetry.addLine("Dead test");
 
             telemetry.update();
             deltaTime = timer.milliseconds() - timerS;
