@@ -7,16 +7,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -28,29 +22,37 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 @Config
 @TeleOp(name = "drive program prototype")
 public class drivePrototype extends LinearOpMode {
-    private Motor frontLeftMotor = null; private Motor backLeftMotor = null;
-    private Motor frontRightMotor = null; private Motor backRightMotor = null;
-    private Servo claw = null;
-    private CRServo lift = null; private Servo tower = null;
-
-    private ColorSensor front; ColorSensor right; ColorSensor back; ColorSensor left;
-
-    private BNO055IMU imu = null;
-    Orientation lastAngles = new Orientation();
-    double globalAngle;
     public static double kP = 0.018, kI = 0, kD = 0;
     public static double kPTower = 0.0003;
+    ColorSensor right;
+    ColorSensor back;
+    ColorSensor left;
+    Orientation lastAngles = new Orientation();
+    double globalAngle;
+    private Motor frontLeftMotor = null;
+    private Motor backLeftMotor = null;
+    private Motor frontRightMotor = null;
+    private Motor backRightMotor = null;
+    private Servo claw = null;
+    private CRServo lift = null;
+    private Servo tower = null;
+    private ColorSensor front;
+    private BNO055IMU imu = null;
 
     @Override
     public void runOpMode() {
-        frontLeftMotor = new Motor(hardwareMap, "leftFront"); backLeftMotor = new Motor(hardwareMap, "leftRear");
-        frontRightMotor = new Motor(hardwareMap, "rightFront"); backRightMotor = new Motor(hardwareMap, "rightRear");
+        frontLeftMotor = new Motor(hardwareMap, "leftFront");
+        backLeftMotor = new Motor(hardwareMap, "leftRear");
+        frontRightMotor = new Motor(hardwareMap, "rightFront");
+        backRightMotor = new Motor(hardwareMap, "rightRear");
 
         claw = hardwareMap.get(Servo.class, "claw");
         tower = hardwareMap.get(Servo.class, "tower");
         lift = hardwareMap.get(CRServo.class, "lift");
-        front = hardwareMap.get(ColorSensor.class, "front"); right = hardwareMap.get(ColorSensor.class, "right");
-        left = hardwareMap.get(ColorSensor.class, "left"); back = hardwareMap.get(ColorSensor.class, "back");
+        front = hardwareMap.get(ColorSensor.class, "front");
+        right = hardwareMap.get(ColorSensor.class, "right");
+        left = hardwareMap.get(ColorSensor.class, "left");
+        back = hardwareMap.get(ColorSensor.class, "back");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         frontLeftMotor.setRunMode(Motor.RunMode.RawPower);
@@ -111,61 +113,55 @@ public class drivePrototype extends LinearOpMode {
             double xStick = driverOp.getLeftX();
             double yStick = driverOp.getLeftY();
             double velo = 1;
-            if(Math.abs(xStick) > 0.75){
+            if (Math.abs(xStick) > 0.75) {
                 xStick = Math.signum(xStick);
             }
-            if(Math.abs(yStick) > 0.75){
+            if (Math.abs(yStick) > 0.75) {
                 yStick = Math.signum(yStick);
             }
-            velo = 1-driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) * 0.7;
+            velo = 1 - driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) * 0.7;
             boolean lT = gamepad2.left_trigger > 0.2;
             double liftVel = 0;
-            if(!lTLast && lT){
+            if (!lTLast && lT) {
                 clawOpen = !clawOpen;
             }
-            if(gamepad2.x){
-                clawOpen = true;
-            }
-            if(gamepad2.y){
-                clawOpen = false;
-            }
-            if(clawOpen){
+            if (gamepad2.left_bumper)
+                clawOpen = !clawOpen;
+
+            if (clawOpen) {
                 clawPos = 0.8;
-            }
-            else {
+            } else {
                 clawPos = 0.6;
             }
             claw.setPosition(clawPos);
             lTLast = lT;
             //set the target position for the tower based on driver input
-            if(gamepad2.dpad_down){
+            if (gamepad2.dpad_down) {
                 trgTowerPrev = trgTower;
                 trgTower = 4;
             }
-            if(gamepad2.dpad_right){
+            if (gamepad2.dpad_right) {
                 trgTowerPrev = trgTower;
                 trgTower = 1;
             }
-            if(gamepad2.dpad_left){
+            if (gamepad2.dpad_left) {
                 trgTowerPrev = trgTower;
                 trgTower = 3;
             }
-            if(gamepad2.dpad_up){
+            if (gamepad2.dpad_up) {
                 trgTowerPrev = trgTower;
                 trgTower = 2;
             }
-            if(gamepad2.right_bumper){
+            if (gamepad2.right_bumper) {
                 liftVel = 1;
-            }
-            else if(gamepad2.right_trigger > 0.2){
+            } else if (gamepad2.right_trigger > 0.2) {
                 liftVel = -0.775;
-            }
-            else{
+            } else {
                 liftVel = 0;
             }
 
             //read from light sensor based on target
-            switch(trgTower){
+            switch (trgTower) {
                 case 2:
                     readingTower = front.alpha();
                     break;
@@ -189,40 +185,37 @@ public class drivePrototype extends LinearOpMode {
             }
             //set the target heading
             //if (driverOp.getRightY() * driverOp.getRightY() + driverOp.getRightX() * driverOp.getRightX() > 0.4) {
-                //targetHeading = Math.toDegrees(Math.atan2(-driverOp.getRightX(), -driverOp.getRightY()));
+            //targetHeading = Math.toDegrees(Math.atan2(-driverOp.getRightX(), -driverOp.getRightY()));
             //}1
-            if(Math.abs(driverOp.getRightX()) > 0.15){
-                targetHeading += driverOp.getRightX() * turnRate * deltaTime/1000;
+            if (Math.abs(driverOp.getRightX()) > 0.15) {
+                targetHeading += driverOp.getRightX() * turnRate * deltaTime / 1000;
             }
-            if(targetHeading < -180){
+            if (targetHeading < -180) {
                 targetHeading += 360;
-            }
-            else if(targetHeading > 180){
+            } else if (targetHeading > 180) {
                 targetHeading -= 360;
             }
-            if((relativeHeading > 90 && targetHeading < -90) || (relativeHeading < -90 && targetHeading > 90)){
+            if ((relativeHeading > 90 && targetHeading < -90) || (relativeHeading < -90 && targetHeading > 90)) {
                 dir2 = -1;
-            }
-            else{
+            } else {
                 dir2 = 1;
             }
-            if(Math.abs(ang.getPositionError()) > 300){
+            if (Math.abs(ang.getPositionError()) > 300) {
                 depression = 0.65;
-            }
-            else{
+            } else {
                 depression = 1;
             }
             //lift turn direction
-            if(trgTower > trgTowerPrev){
+            if (trgTower > trgTowerPrev) {
                 dir = 1;
                 //targetTowerVal = -Math.abs(targetTowerVal);
             }
-            if(trgTower < trgTowerPrev){
+            if (trgTower < trgTowerPrev) {
                 dir = -1;
                 //targetTowerVal = Math.abs(targetTowerVal);
             }
 
-            if(errorDelta < -2500){
+            if (errorDelta < -2500) {
                 dir = -1;
             }
 //            if(relativeHeading > 0){
@@ -239,13 +232,12 @@ public class drivePrototype extends LinearOpMode {
             double vel = kPTower * error * dir;
 
             //set velocities
-            if(!gamepad2.y) {
+            if (!gamepad2.y) {
                 setTower(vel);
-            }
-            else{
+            } else {
                 setTower(0);
             }
-            drive.driveFieldCentric(-yStick*velo, xStick * velo, turn, relativeHeading);
+            drive.driveFieldCentric(-yStick * velo, xStick * velo, turn, relativeHeading);
             lift.setPower(liftVel);
             //calculate deltas
             deltaHeading = relativeHeading - lastHeading;
@@ -283,10 +275,10 @@ public class drivePrototype extends LinearOpMode {
         }
     }
 
-    void setTower(double v){
+    void setTower(double v) {
         double vScaled = clamp(v, 1);
         vScaled *= 0.25;
-        tower.setPosition(0.5+vScaled);
+        tower.setPosition(0.5 + vScaled);
     }
 
     double clamp(double v, double bounds) {
@@ -302,13 +294,13 @@ public class drivePrototype extends LinearOpMode {
             return v;
         }
     }
-    void resetAngle(){
+
+    void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES);
         globalAngle = 0;
     }
 
-    private double getAngle()
-    {
+    private double getAngle() {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
         // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
