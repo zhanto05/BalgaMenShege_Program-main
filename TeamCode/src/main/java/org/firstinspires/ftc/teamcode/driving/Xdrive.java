@@ -24,22 +24,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
-@TeleOp(name = "MainXDrive")
+@TeleOp(name = "MotorTestik")
 public class Xdrive extends LinearOpMode {
     private Motor frontLeftMotor = null;
     private Motor backLeftMotor = null;
     private Motor frontRightMotor = null;
     private Motor backRightMotor = null;
-    private Servo claw = null;
-    private CRServo tower = null;
-    private CRServo lift = null;
-    private BNO055IMU imu = null;
-
-    private DigitalChannel lmao = null;
-
-    Orientation lastAngles = new Orientation();
-    double globalAngle;
-    public static double kP = 0.04, kI = 0, kD = 0;
+//    private Servo claw = null;
+//    private CRServo tower = null;
+//    private CRServo lift = null;
+//    private BNO055IMU imu = null;
+//
+//    private DigitalChannel lmao = null;
+//
+//    Orientation lastAngles = new Orientation();
+//    double globalAngle;
+//    public static double kP = 0.04, kI = 0, kD = 0;
 
     @Override
     public void runOpMode() {
@@ -48,17 +48,17 @@ public class Xdrive extends LinearOpMode {
         frontRightMotor = new Motor(hardwareMap, "rightFront");
         backRightMotor = new Motor(hardwareMap, "rightRear");
         //backRightMotor = hardwareMap.get(Motor.class, "rightRear");
-        claw = hardwareMap.get(Servo.class, "claw");
-        tower = hardwareMap.get(CRServo.class, "tower");
-        lift = hardwareMap.get(CRServo.class, "lift");
-        lmao = hardwareMap.get(DigitalChannel.class, "lmao");
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-
-        PIDFController ang = new PIDFController(kP, kI, kD, 0);
-        HDrive drive = new HDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-
-        lmao.setMode(DigitalChannel.Mode.OUTPUT);
+//        claw = hardwareMap.get(Servo.class, "claw");
+//        tower = hardwareMap.get(CRServo.class, "tower");
+//        lift = hardwareMap.get(CRServo.class, "lift");
+//        lmao = hardwareMap.get(DigitalChannel.class, "lmao");
+//
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//
+//        PIDFController ang = new PIDFController(kP, kI, kD, 0);
+//        HDrive drive = new HDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+//
+//        lmao.setMode(DigitalChannel.Mode.OUTPUT);
 
 
         // Retrieve the IMU from the hardware map
@@ -69,7 +69,7 @@ public class Xdrive extends LinearOpMode {
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled = false;
-        imu.initialize(parameters);
+//        imu.initialize(parameters);
 
         double savedHeading = 0.0;
         double targetHeading = 0.0;
@@ -88,145 +88,162 @@ public class Xdrive extends LinearOpMode {
         if (isStopRequested()) return;
         waitForStart();
         while (opModeIsActive()) {
-            lmao.setState(driverOp.getButton(GamepadKeys.Button.DPAD_LEFT));
-            if (driverOp.getButton(GamepadKeys.Button.DPAD_LEFT)) {
-
-            }
-            else if (driverOp.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
-//                tower.setPower(-1);
-            }
-            else{
-                //tower.setPower(0);
-            }
-            if (driverOp.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                lift.setPower(1);
-            }
-            else if (driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-                lift.setPower(-1);
-            }
-            else{
-                lift.setPower(0);
-            }
-            if(driverOp.getButton(GamepadKeys.Button.A)){
-                claw.setPosition(0);
-            }
-            else if (driverOp.getButton(GamepadKeys.Button.Y)){
-                claw.setPosition(1);
-            }
-
-
-
-            ang.setP(kP);
-            ang.setI(kI);
-            ang.setD(kD);
-            double elapsedTime = timer.time() - prevTime;
-            prevTime = timer.time();
-
-            double absoluteHeading = getAngle();
-
-            double relativeHeading;
-            if (gamepad1.b) {
-                savedHeading = absoluteHeading ;
-            }
-
-//            targetHeading -= gamepad1.right_stick_x * elapsedTime;
-
-            relativeHeading = absoluteHeading - savedHeading;
-            if (driverOp.getRightY() * driverOp.getRightY() + driverOp.getRightX() * driverOp.getRightX() > 0.4) {
-                //pizdec xuyna
-                //targetHeading += driverOp.getRightX() * turnRate * elapsedTime;
-
-                //blyaaaaaaaaaa
-                targetHeading = Math.toDegrees(Math.atan2(-driverOp.getRightX(), -driverOp.getRightY()));
-            }
-
-            if(targetHeading > 179){
-                targetHeading = 179;
-            }
-            else if(targetHeading < -179){
-                targetHeading = -179;
-            }
-
-//adilrofl
-//            if(targetHeading > 210){
-//                targetHeading -= 390;
+//            lmao.setState(driverOp.getButton(GamepadKeys.Button.DPAD_LEFT));
+//            if (driverOp.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+//
 //            }
-//            if(targetHeading < -210){
-//                targetHeading += 390;
+//            else if (driverOp.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
+////                tower.setPower(-1);
 //            }
-
-            //dastanrofl
-//            double turnedValue;
-//            double needToTurn = 0;
-//            if(targetHeading > 180 && absoluteHeading <=160){
-//                turnedValue = getAngle();
-//                needToTurn = 360 - turnedValue;
-//                absoluteHeading = 0;
-//            }else if(targetHeading > needToTurn && absoluteHeading <= needToTurn){
-//                absoluteHeading = 0;
+//            else{
+//                //tower.setPower(0);
 //            }
-
-//            if (absoluteHeading > 180) {
-//                absoluteHeading -= 360;
+//            if (driverOp.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+//                lift.setPower(1);
 //            }
-//            if (absoluteHeading < -180) {
-//                absoluteHeading += 360;
+//            else if (driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+//                lift.setPower(-1);
 //            }
+//            else{
+//                lift.setPower(0);
+//            }
+//            if(driverOp.getButton(GamepadKeys.Button.A)){
+//                claw.setPosition(0);
+//            }
+//            else if (driverOp.getButton(GamepadKeys.Button.Y)){
+//                claw.setPosition(1);
+//            }
+            if (gamepad2.a){
+                frontLeftMotor.motor.setPower(0.15);
+            }
+            else frontLeftMotor.motor.setPower(0);
+            if (gamepad2.b){
+                frontRightMotor.motor.setPower(0.15);
+            }
+            else frontRightMotor.motor.setPower(0);
+            if (gamepad2.x){
+                backLeftMotor.motor.setPower(0.15);
+            }
+            else backLeftMotor.motor.setPower(0);
+            if (gamepad2.y){
+                backRightMotor.motor.setPower(0.15);
+            }
+            else backRightMotor.motor.setPower(0);
 
-            errHeading = targetHeading - relativeHeading;
+//
+//
+//            ang.setP(kP);
+//            ang.setI(kI);
+//            ang.setD(kD);
+//            double elapsedTime = timer.time() - prevTime;
+//            prevTime = timer.time();
+//
+//            double absoluteHeading = getAngle();
+//
+//            double relativeHeading;
+//            if (gamepad1.b) {
+//                savedHeading = absoluteHeading ;
+//            }
+//
+////            targetHeading -= gamepad1.right_stick_x * elapsedTime;
+//
+//            relativeHeading = absoluteHeading - savedHeading;
+//            if (driverOp.getRightY() * driverOp.getRightY() + driverOp.getRightX() * driverOp.getRightX() > 0.4) {
+//                //pizdec xuyna
+//                //targetHeading += driverOp.getRightX() * turnRate * elapsedTime;
+//
+//                //blyaaaaaaaaaa
+//                targetHeading = Math.toDegrees(Math.atan2(-driverOp.getRightX(), -driverOp.getRightY()));
+//            }
+//
+//            if(targetHeading > 179){
+//                targetHeading = 179;
+//            }
+//            else if(targetHeading < -179){
+//                targetHeading = -179;
+//            }
+//
+////adilrofl
+////            if(targetHeading > 210){
+////                targetHeading -= 390;
+////            }
+////            if(targetHeading < -210){
+////                targetHeading += 390;
+////            }
+//
+//            //dastanrofl
+////            double turnedValue;
+////            double needToTurn = 0;
+////            if(targetHeading > 180 && absoluteHeading <=160){
+////                turnedValue = getAngle();
+////                needToTurn = 360 - turnedValue;
+////                absoluteHeading = 0;
+////            }else if(targetHeading > needToTurn && absoluteHeading <= needToTurn){
+////                absoluteHeading = 0;
+////            }
+//
+////            if (absoluteHeading > 180) {
+////                absoluteHeading -= 360;
+////            }
+////            if (absoluteHeading < -180) {
+////                absoluteHeading += 360;
+////            }
+//
+//            errHeading = targetHeading - relativeHeading;
+//
+//            double turn = ang.calculate(relativeHeading, targetHeading);
+//
+//            drive.driveFieldCentric(-driverOp.getLeftX(), -driverOp.getLeftY(), turn, relativeHeading);
+//
+//            deltaHeading = absoluteHeading - lastHeading;
+//            lastHeading = absoluteHeading;
+//
+//
+//            telemetry.addData("cock", lift.getManufacturer());
+//            telemetry.addData("absolute heading", absoluteHeading);
+//            telemetry.addData("saved heading", savedHeading);
+//            telemetry.addData("relative heading", relativeHeading);
+//            telemetry.addData("target heading", targetHeading);
+//            telemetry.addData("error", errHeading);
+//            telemetry.addData("kP", kP);
+//            telemetry.addData("kP * error", kP * errHeading);
+//            telemetry.addData("delta", deltaHeading);
+//            telemetry.update();
+//        }
+//    }
+//
+//    double clamp(double v, double bounds) {
+//        return clamp(v, -bounds, bounds);
+//    }
+//
+//    double clamp(double v, double min, double max) {
+//        if (v > max) {
+//            return max;
+//        } else if (v < min) {
+//            return min;
+//        } else {
+//            return v;
+//        }
+//    }
+//    void resetAngle(){
+//        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        globalAngle = 0;
 
-            double turn = ang.calculate(relativeHeading, targetHeading);
-
-            drive.driveFieldCentric(-driverOp.getLeftX(), -driverOp.getLeftY(), turn, relativeHeading);
-
-            deltaHeading = absoluteHeading - lastHeading;
-            lastHeading = absoluteHeading;
-
-
-            telemetry.addData("cock", lift.getManufacturer());
-            telemetry.addData("absolute heading", absoluteHeading);
-            telemetry.addData("saved heading", savedHeading);
-            telemetry.addData("relative heading", relativeHeading);
-            telemetry.addData("target heading", targetHeading);
-            telemetry.addData("error", errHeading);
-            telemetry.addData("kP", kP);
-            telemetry.addData("kP * error", kP * errHeading);
-            telemetry.addData("delta", deltaHeading);
-            telemetry.update();
-        }
-    }
-
-    double clamp(double v, double bounds) {
-        return clamp(v, -bounds, bounds);
-    }
-
-    double clamp(double v, double min, double max) {
-        if (v > max) {
-            return max;
-        } else if (v < min) {
-            return min;
-        } else {
-            return v;
-        }
-    }
-    void resetAngle(){
-        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        globalAngle = 0;
-    }
-
-    double getAngle(){
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-//        if(deltaAngle < -180)
-//            deltaAngle += 360;
-//        else if(deltaAngle > 180)
-//            deltaAngle -= 360;
-        globalAngle+=deltaAngle;
-        lastAngles = angles;
-
-        return globalAngle;
-    }
-}
+//
+//    double getAngle(){
+//        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+////        if(deltaAngle < -180)
+////            deltaAngle += 360;
+////        else if(deltaAngle > 180)
+////            deltaAngle -= 360;
+//        globalAngle+=deltaAngle;
+//        lastAngles = angles;
+//
+//        return globalAngle;
+//       // }
+//}
+        }}}
 
 
 //// Adjust the orientation parameters to match your robot
@@ -287,7 +304,6 @@ public class Xdrive extends LinearOpMode {
 //            double rotY = x * Math.sin(-relativeHeading) + y * Math.cos(-relativeHeading);
 
 //            drive.driveFieldCentric(x, y, rx, absoluteHeading);
-
 
 
 //            double lenDriveVec = Math.hypot(x, y);
